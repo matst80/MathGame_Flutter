@@ -38,26 +38,20 @@ Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
   var answerWidgets = shuffle(answers
       .map(
         (answer) => ActionChip(
-              backgroundColor: Colors.blue,
+              backgroundColor: Colors.black,
               onPressed: () => onAnswer(answer),
               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               labelStyle: numberStyle,
               key: Key(answer.toString()),
               label: Text(answer.toInt().toString()),
-              // child: SizedBox(
-              //   width: 100,
-              //   height: 100,
-              //   child: Center(
-              //     child: Text(answer.toInt().toString(), style: numberStyle),
-              //   ),
-              // ),
             ),
       )
       .toList());
   return Padding(
-    padding: const EdgeInsets.all(16.0),
+    padding: const EdgeInsets.all(32.0),
     child: Wrap(
       spacing: 18,
+      alignment: WrapAlignment.center,
       runSpacing: 18,
       children: answerWidgets,
     ),
@@ -207,8 +201,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             Text(_question.otherNumber.toString(), style: bigNumberStyle),
           ]),
           Container(
-            color: Colors.tealAccent,
-            child: buildAnswers(_question.answers, _gotAnswer),
+            color: Colors.grey,
+            child: Center(
+              child: buildAnswers(_question.answers, _gotAnswer),
+            ),
           ),
         ],
       ),
