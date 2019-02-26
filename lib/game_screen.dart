@@ -37,31 +37,38 @@ Widget buildUsers(List<User> users) {
 Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
   var answerWidgets = shuffle(answers
       .map(
-        (answer) => RaisedButton(
-              color: Colors.blue,
+        (answer) => ActionChip(
+              backgroundColor: Colors.blue,
               onPressed: () => onAnswer(answer),
+              padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+              labelStyle: numberStyle,
               key: Key(answer.toString()),
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: Center(
-                  child: Text(answer.toInt().toString(), style: numberStyle),
-                ),
-              ),
+              label: Text(answer.toInt().toString()),
+              // child: SizedBox(
+              //   width: 100,
+              //   height: 100,
+              //   child: Center(
+              //     child: Text(answer.toInt().toString(), style: numberStyle),
+              //   ),
+              // ),
             ),
       )
       .toList());
-  return Wrap(
-    spacing: 8,
-    runSpacing: 8,
-    children: answerWidgets,
+  return Padding(
+    padding: const EdgeInsets.all(16.0),
+    child: Wrap(
+      spacing: 18,
+      runSpacing: 18,
+      children: answerWidgets,
+    ),
   );
 }
 
 var numberStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
+var bigNumberStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 70);
 
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
-  double _questionOpacity = 1;
+  //double _questionOpacity = 1;
   List<User> _users = List<User>();
   String _lastWinner = '';
   User _me;
@@ -71,13 +78,44 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   AnimationController _controller;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   static const int kStartValue = 4;
+
+  void _showBottomSheet() {
+    showModalBottomSheet<void>(
+        context: _scaffoldKey.currentState.context,
+        builder: (BuildContext context) {
+          return Container(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Winner: $_lastWinner',
+                    style: numberStyle,
+                  ),
+                  Countdown(
+                    animation: new StepTween(
+                      begin: kStartValue,
+                      end: 1,
+                    ).animate(_controller),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
 
   void gotQuestion(CalculationQuestion question) {
     _controller.forward(from: 0.0);
-    setState(() {
-      _question = question;
-    });
+    _showBottomSheet();
+
+    Future.delayed(Duration(milliseconds: 3500)).then((o) => setState(() {
+          _question = question;
+        }));
   }
 
   void gotRound(Round round) {
@@ -113,15 +151,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   }
 
   void handleState(state) {
-    setState(() {
-      _questionOpacity = state == AnimationStatus.completed ? 1 : 0;
-    });
+    if (state == AnimationStatus.completed) {
+      Navigator.pop(_scaffoldKey.currentState.context);
+    }
   }
 
   @override
   void initState() {
-    setupSocket();
     super.initState();
+    setupSocket();
     _controller = new AnimationController(
       duration: new Duration(seconds: kStartValue),
       vsync: this,
@@ -140,7 +178,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     } else {
       setState(() {
         _question = stateQuestion;
-        //volitileTitle = isCorrect ? 'Correct' : 'Wrong';
       });
     }
   }
@@ -154,56 +191,30 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(widget.title + ' - ' + widget.name),
       ),
-      body: Stack(
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: _questionOpacity,
-              child: Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      buildUsers(_users),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(_question.firstNumber.toString(),
-                                style: numberStyle),
-                            Text(_question.modeChar, style: numberStyle),
-                            Text(_question.otherNumber.toString(),
-                                style: numberStyle),
-                          ]),
-                      buildAnswers(_question.answers, _gotAnswer),
-                    ]),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: new Opacity(
-              opacity: 1 - _questionOpacity,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Winner: $_lastWinner'),
-                    Countdown(
-                      animation: new StepTween(
-                        begin: kStartValue,
-                        end: 1,
-                      ).animate(_controller),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          buildUsers(_users),
+          SizedBox(height: 30),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(_question.firstNumber.toString(), style: bigNumberStyle),
+            Text(_question.modeChar, style: bigNumberStyle),
+            Text(_question.otherNumber.toString(), style: bigNumberStyle),
+          ]),
+          Container(
+            color: Colors.tealAccent,
+            child: buildAnswers(_question.answers, _gotAnswer),
           ),
         ],
       ),
+
       // floatingActionButton: FloatingActionButton(
-      //   onPressed: _incrementCounter,
+      //   onPressed: () => {},
       //   tooltip: 'Increment',
       //   child: Icon(Icons.add),
       // ),

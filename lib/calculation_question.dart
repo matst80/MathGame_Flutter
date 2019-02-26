@@ -87,9 +87,11 @@ CalculationQuestion _generateQuestion(int difficulty) {
   var rnd = new Random();
   var mode = randomMode(rnd);
   if (mode == CalculationMode.div) {
-    var f = rnd.nextInt(difficulty~/2) + 1;
-    var f2 = rnd.nextInt(difficulty~/2) + 1;
-    return CalculationQuestion(mode, f*f2, f2);
+    var f = rnd.nextInt(difficulty ~/ 3) + 1;
+    var f2 = rnd.nextInt(difficulty ~/ 3) + 1;
+    return CalculationQuestion(mode, f * f2, f2);
+  } else if (mode == CalculationMode.mul) {
+    difficulty = difficulty ~/ 2;
   }
   return CalculationQuestion(
       mode, rnd.nextInt(difficulty), rnd.nextInt(difficulty));
