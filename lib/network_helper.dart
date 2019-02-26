@@ -2,8 +2,16 @@ import 'package:wifi/wifi.dart';
 import 'calculation_question.dart';
 import 'dart:io';
 import 'dart:convert';
+import 'user.dart';
+import 'round.dart';
 
 typedef void gotQuestionOverUDP(CalculationQuestion question);
+typedef void gotRoundOverUDP(Round round);
+typedef void gotUserOverUDP(User user);
+
+Future<String> getIp() async {
+  return await Wifi.ip;
+}
 
 Future<String> getBroadcastAddress() async {
   String ip = await Wifi.ip;
@@ -12,32 +20,65 @@ Future<String> getBroadcastAddress() async {
 }
 
 RawDatagramSocket _socket;
+InternetAddress _address;
 
-Future<void> setupUdpListener(gotQuestionOverUDP onQuestion) async {
-  var bcast = await getBroadcastAddress();
-  //var _sendAddress = InternetAddress(bcast);
-  print(bcast);
-  _socket = await RawDatagramSocket.bind(bcast, 1337);
-  _socket.multicastHops = 20;
-  _socket.broadcastEnabled = true;
-  _socket.writeEventsEnabled = true;
-
-  _socket.listen((RawSocketEvent event) {
-    if (event == RawSocketEvent.read) {
-      final datagramPacket = _socket.receive();
-      if (datagramPacket == null) return;
-      var stringData = utf8.decode(datagramPacket.data);
-      var jsonMap = jsonDecode(stringData);
-      onQuestion(CalculationQuestion.fromJson(jsonMap));
-    }
-  });
+void disconnectSocket() {
+  _socket.close();
+  _socket = null;
 }
 
-Future<bool> sendQuestion(CalculationQuestion question) async {
-  var addr = InternetAddress(await getBroadcastAddress());
+Future<void> setupUdpListener(gotQuestionOverUDP onQuestion,
+    gotRoundOverUDP onRound, gotUserOverUDP onUser) async {
+  if (_socket == null) {
+    var bcast = await getBroadcastAddress();
+    _address = InternetAddress(bcast);
+
+    _socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, 1337);
+    _socket.multicastHops = 20;
+    _socket.broadcastEnabled = true;
+    _socket.writeEventsEnabled = true;
+
+    _socket.listen((RawSocketEvent event) {
+      if (event == RawSocketEvent.read) {
+        final datagramPacket = _socket.receive();
+        if (datagramPacket == null) return;
+        var stringData = utf8.decode(datagramPacket.data);
+        var jsonMap = jsonDecode(stringData);
+        if (jsonMap['mode'] != null)
+          onQuestion(CalculationQuestion.fromJson(jsonMap));
+        else if (jsonMap['winner'] != null) {
+          onRound(Round.fromJson(jsonMap));
+        } else if (jsonMap['name'] != null) {
+          onUser(User.fromJson(jsonMap));
+        }
+      }
+    });
+  }
+}
+
+int sendData(String data) {
+  return _socket.send(utf8.encode(data), _address, 1337);
+}
+
+void sendUser(User user) {
   try {
-    var dataString = jsonEncode(question.toJson());
-    _socket.send(utf8.encode(dataString), addr, 1337);
+    sendData(jsonEncode(user.toJson()));
+  } catch (e) {
+    print(e);
+  }
+}
+
+void sendRound(Round round) {
+  try {
+    sendData(jsonEncode(round.toJson()));
+  } catch (e) {
+    print(e);
+  }
+}
+
+void sendQuestion(CalculationQuestion question) {
+  try {
+    sendData(jsonEncode(question.toJson()));
   } catch (e) {
     print(e);
   }

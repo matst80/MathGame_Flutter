@@ -22,6 +22,7 @@ dependencies:
 
 dev_dependencies:
   json_annotation: any
+  shared_preferences: any
   wifi: any
   flutter_test:
     sdk: flutter
