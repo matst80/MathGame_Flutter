@@ -11,7 +11,7 @@ typedef void AnswerPressed(double answer);
 Widget buildUsers(List<User> users) {
   var userWidgets = users
       .map((user) => Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(user.name),
               Text(user.score.toString()),
@@ -168,7 +168,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          buildUsers(_users),
+          Padding(
+            padding: EdgeInsets.all(20),
+            child: buildUsers(_users),
+          ),
           SizedBox(height: 30),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Text(_question.firstNumber.toString(), style: bigNumberStyle),

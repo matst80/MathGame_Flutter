@@ -14,7 +14,7 @@ var winnerStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 70);
 
 class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
   AnimationController _controller;
-  static const int kStartValue = 4;
+  static const int kStartValue = 3;
 
   @override
   void initState() {
@@ -30,27 +30,30 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var _lastWinner = widget.winner;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Vinnare:',
-              style: winnerTextStyle,
-            ),
-            Text(
-              _lastWinner,
-              style: winnerStyle,
-            ),
-            Countdown(
-              animation: new StepTween(
-                begin: kStartValue,
-                end: 1,
-              ).animate(_controller),
-            ),
-          ],
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Vinnare:',
+                style: winnerTextStyle,
+              ),
+              Text(
+                _lastWinner,
+                style: winnerStyle,
+              ),
+              Countdown(
+                animation: new StepTween(
+                  begin: kStartValue,
+                  end: 0,
+                ).animate(_controller),
+              ),
+            ],
+          ),
         ),
       ),
     );
