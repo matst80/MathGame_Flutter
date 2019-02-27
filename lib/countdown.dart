@@ -92,7 +92,10 @@ class Countdown extends AnimatedWidget {
   build(BuildContext context) {
     return new Text(
       animation.value.toString(),
-      style: new TextStyle(fontSize: 150.0),
+      style: new TextStyle(
+        fontSize: 150.0,
+        color: Colors.blue.shade200,
+      ),
     );
   }
 }
