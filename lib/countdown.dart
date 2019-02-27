@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'user.dart';
 import 'userlist.dart';
+import 'dart:math';
 
 class WaitScreen extends StatefulWidget {
   WaitScreen({Key key, this.winner, this.users}) : super(key: key);
@@ -70,17 +71,62 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
                 _lastWinner,
                 style: winnerStyle,
               ),
-              Countdown(
-                animation: new StepTween(
-                  begin: kStartValue,
-                  end: 0,
-                ).animate(_controller),
-              ),
+              Stack(children: <Widget>[
+                Positioned.fill(
+                  child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (BuildContext context, Widget child) {
+                      return CustomPaint(
+                        painter: TimerPainter(
+                          animation: _controller,
+                          color: Colors.white,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Align(
+                  alignment: FractionalOffset.center,
+                  child: Countdown(
+                    animation: new StepTween(
+                      begin: kStartValue,
+                      end: 0,
+                    ).animate(_controller),
+                  ),
+                ),
+              ]),
             ],
           ),
         ),
       ),
     );
+  }
+}
+
+class TimerPainter extends CustomPainter {
+  final Animation<double> animation;
+  final Color color;
+
+  TimerPainter({this.animation, this.color})
+      : super(repaint: animation);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    Paint paint = Paint()
+      ..color = color
+      ..strokeWidth = 5.0
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+
+    //canvas.drawCircle(size.center(Offset.zero), size.width / 2.0, paint);
+    
+    double progress = (1.0 - animation.value) * 2 * pi;
+    canvas.drawArc(Offset.zero & size, pi, -progress, false, paint);
+  }
+
+  @override
+  bool shouldRepaint(TimerPainter old) {
+    return animation.value != old.animation.value;
   }
 }
 
