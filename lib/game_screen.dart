@@ -3,26 +3,11 @@ import 'calculation_question.dart';
 import 'utils.dart';
 import 'network_helper.dart';
 import 'countdown.dart';
-import 'user.dart';
 import 'round.dart';
+import 'user.dart';
+import 'userlist.dart';
 
 typedef void AnswerPressed(double answer);
-
-Widget buildUsers(List<User> users) {
-  var userWidgets = users
-      .map((user) => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(user.name),
-              Text(user.score.toString()),
-            ],
-          ))
-      .toList();
-  return Column(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: userWidgets,
-  );
-}
 
 Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
   var answerWidgets = shuffle(answers
@@ -76,7 +61,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         _scaffoldKey.currentState.context,
         MaterialPageRoute<void>(
           builder: (BuildContext context) {
-            return WaitScreen(winner: _lastWinner);
+            return WaitScreen(winner: _lastWinner, users: _users);
           },
           fullscreenDialog: true,
         ));
@@ -95,7 +80,6 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     Future.delayed(Duration(milliseconds: 3500))
         .then((o) => showNewQuestion(question));
 
-    print('after modal');
   }
 
   void gotRound(Round round) {
@@ -168,9 +152,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Padding(
-            padding: EdgeInsets.all(20),
-            child: buildUsers(_users),
+          Hero(
+            tag: 'userlist',
+            child: Material(
+              color: Colors.lightGreen,
+              child: UserList(users: _users),
+            ),
           ),
           SizedBox(height: 30),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [

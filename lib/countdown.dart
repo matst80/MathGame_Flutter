@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'user.dart';
+import 'userlist.dart';
+
 
 class WaitScreen extends StatefulWidget {
-  WaitScreen({Key key, this.winner}) : super(key: key);
+  WaitScreen({Key key, this.winner, this.users}) : super(key: key);
 
   final String winner;
+  final List<User> users;
 
   @override
   _WaitScreen createState() => _WaitScreen();
@@ -38,6 +42,13 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Hero(
+                tag: 'userlist',
+                child: Material(
+                  color: Colors.blue,
+                  child: UserList(users: widget.users),
+                ),
+              ),
               Text(
                 'Vinnare:',
                 style: winnerTextStyle,
