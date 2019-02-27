@@ -12,15 +12,15 @@ class CalculationQuestion {
     this.mode = mode;
     switch (mode) {
       case CalculationMode.add:
-        modeChar = ' + ';
+        modeChar = '+';
         correctResult = (first + second).toDouble();
         break;
       case CalculationMode.sub:
-        modeChar = ' - ';
+        modeChar = '-';
         correctResult = (first - second).toDouble();
         break;
       case CalculationMode.div:
-        modeChar = ' / ';
+        modeChar = '/';
         if (second < 0) {
           second = 1;
         }

@@ -4,7 +4,9 @@ import 'game_screen.dart';
 
 void main() => runApp(MyApp());
 
-var loginStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 30);
+var loginStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 16);
+var loginTitleStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: Colors.white);
+
 
 class MyApp extends StatelessWidget {
   @override
@@ -50,30 +52,42 @@ class _Onboarding extends State<Onboarding> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        elevation: 7,
-        title: Text('Select nick'),
-      ),
-      backgroundColor: Colors.green.shade600,
+      // appBar: AppBar(
+      //   elevation: 7,
+      //   title: Text('Select nick'),
+      // ),
+      backgroundColor: Colors.green.shade400,
       body: Container(
         padding: EdgeInsets.all(40),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              'Enter your name to start the game',
+              style: loginTitleStyle,
+            ),
+            SizedBox(height: 17),
             TextField(
               controller: nameController,
               style: loginStyle,
               autocorrect: true,
               keyboardType: TextInputType.text,
-              decoration: InputDecoration(hintText: 'Your nickname'),
+              decoration: InputDecoration(
+                hintText: 'Your nickname',
+                hintStyle: loginStyle,
+              ),
             ),
             SizedBox(height: 30),
-            OutlineButton(
-              textColor: Colors.white,
+            RaisedButton(
+              color: Colors.white,
+              textColor: Colors.green.shade400,
               child: Padding(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 35,
+                  vertical: 14,
+                ),
                 child: Text(
-                  'STARTA',
+                  'START GAME',
                   style: loginStyle,
                 ),
               ),

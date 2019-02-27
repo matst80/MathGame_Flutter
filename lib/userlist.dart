@@ -11,7 +11,7 @@ class UserList extends StatefulWidget {
 }
 
 var userNameStyle = TextStyle(
-  color: Colors.white,
+  //color: Colors.white,
   fontWeight: FontWeight.bold,
 );
 
@@ -23,15 +23,17 @@ class _UserList extends State<UserList> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.symmetric(horizontal:16, vertical: 4),
                   child: Text(
                     user.name,
                     style: userNameStyle,
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.symmetric(horizontal:16, vertical: 4),
                   child: Chip(
+                    backgroundColor: Colors.black,
+                    labelStyle: TextStyle(color: Colors.white),
                     label: Text(user.score.toString()),
                   ),
                 ),

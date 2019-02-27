@@ -13,18 +13,6 @@ class WaitScreen extends StatefulWidget {
   _WaitScreen createState() => _WaitScreen();
 }
 
-var winnerTextStyle = TextStyle(
-  fontWeight: FontWeight.normal,
-  fontSize: 60,
-  color: Colors.white,
-);
-
-var winnerStyle = TextStyle(
-  fontWeight: FontWeight.bold,
-  fontSize: 70,
-  color: Colors.white,
-);
-
 class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
   AnimationController _controller;
   static const int kStartValue = 3;
@@ -46,55 +34,70 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: Colors.blue,
-        body: Center(
+        backgroundColor: Colors.white,
+        body: Container(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            //mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Hero(
                 tag: 'userlist',
                 child: Material(
                   elevation: 4,
-                  color: Colors.blue.shade700,
+                  color: Colors.white,
                   child: Padding(
                     padding: EdgeInsets.all(16),
                     child: UserList(users: widget.users),
                   ),
                 ),
               ),
-              SizedBox(height: 30),
-              Text(
-                'Vinnare:',
-                style: winnerTextStyle,
-              ),
-              Text(
-                _lastWinner,
-                style: winnerStyle,
-              ),
-              Stack(children: <Widget>[
-                Positioned.fill(
-                  child: AnimatedBuilder(
-                    animation: _controller,
-                    builder: (BuildContext context, Widget child) {
-                      return CustomPaint(
-                        painter: TimerPainter(
+              SizedBox(height: 60),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'WINNER',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 30,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    Text(
+                      _lastWinner,
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 50,
+                        color: Colors.black,
+                      ),
+                    ),
+                    Stack(children: <Widget>[
+                      Positioned.fill(
+                        child: AnimatedBuilder(
                           animation: _controller,
-                          color: Colors.white,
+                          builder: (BuildContext context, Widget child) {
+                            return CustomPaint(
+                              painter: TimerPainter(
+                                animation: _controller,
+                                color: Colors.white,
+                              ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                      Align(
+                        alignment: FractionalOffset.center,
+                        child: Countdown(
+                          animation: new StepTween(
+                            begin: kStartValue,
+                            end: 0,
+                          ).animate(_controller),
+                        ),
+                      ),
+                    ]),
+                  ],
                 ),
-                Align(
-                  alignment: FractionalOffset.center,
-                  child: Countdown(
-                    animation: new StepTween(
-                      begin: kStartValue,
-                      end: 0,
-                    ).animate(_controller),
-                  ),
-                ),
-              ]),
+              ),
             ],
           ),
         ),
@@ -107,8 +110,7 @@ class TimerPainter extends CustomPainter {
   final Animation<double> animation;
   final Color color;
 
-  TimerPainter({this.animation, this.color})
-      : super(repaint: animation);
+  TimerPainter({this.animation, this.color}) : super(repaint: animation);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -119,7 +121,7 @@ class TimerPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     //canvas.drawCircle(size.center(Offset.zero), size.width / 2.0, paint);
-    
+
     double progress = (1.0 - animation.value) * 2 * pi;
     canvas.drawArc(Offset.zero & size, pi, -progress, false, paint);
   }
