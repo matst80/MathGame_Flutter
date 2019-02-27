@@ -6,16 +6,6 @@ import 'countdown.dart';
 import 'user.dart';
 import 'round.dart';
 
-class GameScreen extends StatefulWidget {
-  GameScreen({Key key, this.title, this.name}) : super(key: key);
-
-  final String title;
-  final String name;
-
-  @override
-  _GameScreenState createState() => _GameScreenState();
-}
-
 typedef void AnswerPressed(double answer);
 
 Widget buildUsers(List<User> users) {
@@ -61,8 +51,17 @@ Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
 var numberStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
 var bigNumberStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 70);
 
+class GameScreen extends StatefulWidget {
+  GameScreen({Key key, this.title, this.name}) : super(key: key);
+
+  final String title;
+  final String name;
+
+  @override
+  _GameScreenState createState() => _GameScreenState();
+}
+
 class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
-  //double _questionOpacity = 1;
   List<User> _users = List<User>();
   String _lastWinner = '';
   User _me;
@@ -70,46 +69,33 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   CalculationQuestion _question =
       CalculationQuestion(CalculationMode.add, 3, 4);
 
-  AnimationController _controller;
-
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  static const int kStartValue = 4;
-
   void _showBottomSheet() {
-    showModalBottomSheet<void>(
-        context: _scaffoldKey.currentState.context,
-        builder: (BuildContext context) {
-          return Container(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Winner: $_lastWinner',
-                    style: numberStyle,
-                  ),
-                  Countdown(
-                    animation: new StepTween(
-                      begin: kStartValue,
-                      end: 1,
-                    ).animate(_controller),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
+    Navigator.push(
+        _scaffoldKey.currentState.context,
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) {
+            return WaitScreen(winner: _lastWinner);
+          },
+          fullscreenDialog: true,
+        ));
+  }
+
+  void showNewQuestion(CalculationQuestion question) {
+    setState(() {
+      _question = question;
+    });
+    Navigator.pop(_scaffoldKey.currentState.context);
   }
 
   void gotQuestion(CalculationQuestion question) {
-    _controller.forward(from: 0.0);
     _showBottomSheet();
 
-    Future.delayed(Duration(milliseconds: 3500)).then((o) => setState(() {
-          _question = question;
-        }));
+    Future.delayed(Duration(milliseconds: 3500))
+        .then((o) => showNewQuestion(question));
+
+    print('after modal');
   }
 
   void gotRound(Round round) {
@@ -144,21 +130,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     sendUser(_me);
   }
 
-  void handleState(state) {
-    if (state == AnimationStatus.completed) {
-      Navigator.pop(_scaffoldKey.currentState.context);
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     setupSocket();
-    _controller = new AnimationController(
-      duration: new Duration(seconds: kStartValue),
-      vsync: this,
-    );
-    _controller.addStatusListener((state) => handleState(state));
   }
 
   void _gotAnswer(double answer) {
