@@ -33,8 +33,22 @@ Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
   );
 }
 
-var numberStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
-var bigNumberStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 70);
+var numberStyle = TextStyle(
+  fontWeight: FontWeight.bold,
+  fontSize: 50,
+);
+var bigNumberStyle = TextStyle(
+  fontWeight: FontWeight.normal,
+  fontSize: 70,
+  color: Colors.white,
+  shadows: <Shadow>[
+    Shadow(
+      offset: Offset(3.0, 3.0),
+      blurRadius: 9.0,
+      color: Color.fromARGB(190, 0, 0, 0),
+    )
+  ],
+);
 
 class GameScreen extends StatefulWidget {
   GameScreen({Key key, this.title, this.name}) : super(key: key);
@@ -77,9 +91,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void gotQuestion(CalculationQuestion question) {
     _showBottomSheet();
 
-    Future.delayed(Duration(milliseconds: 3500))
-        .then((o) => showNewQuestion(question));
-
+    Future.delayed(Duration(
+      milliseconds: 3500,
+    )).then((o) => showNewQuestion(question));
   }
 
   void gotRound(Round round) {
@@ -122,16 +136,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   void _gotAnswer(double answer) {
     var isCorrect = (answer == _question.correctResult);
-    var stateQuestion =
-        isCorrect ? CalculationQuestion.generate(20) : _question;
 
     if (isCorrect) {
-      sendRound(Round(_me.addWin(), 1, stateQuestion));
-      //sendQuestion(stateQuestion);
+      sendRound(Round(
+        _me.addWin(),
+        1,
+        CalculationQuestion.generate(20),
+      ));
     } else {
-      setState(() {
-        _question = stateQuestion;
-      });
+      sendUser(_me.wrongAnswer());
     }
   }
 
@@ -146,8 +159,10 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        elevation: 2,
         title: Text(widget.title + ' - ' + widget.name),
       ),
+      backgroundColor: Colors.green.shade700,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -155,30 +170,31 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           Hero(
             tag: 'userlist',
             child: Material(
-              color: Colors.lightGreen,
-              child: UserList(users: _users),
+              elevation: 4,
+              color: Colors.green.shade600,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: UserList(users: _users),
+              ),
             ),
           ),
-          SizedBox(height: 30),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(_question.firstNumber.toString(), style: bigNumberStyle),
-            Text(_question.modeChar, style: bigNumberStyle),
-            Text(_question.otherNumber.toString(), style: bigNumberStyle),
-          ]),
-          Container(
-            color: Colors.grey,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(_question.firstNumber.toString(), style: bigNumberStyle),
+              Text(_question.modeChar, style: bigNumberStyle),
+              Text(_question.otherNumber.toString(), style: bigNumberStyle),
+            ],
+          ),
+          Material(
+            color: Colors.green,
+            elevation: 4,
             child: Center(
               child: buildAnswers(_question.answers, _gotAnswer),
             ),
           ),
         ],
       ),
-
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: () => {},
-      //   tooltip: 'Increment',
-      //   child: Icon(Icons.add),
-      // ),
     );
   }
 }

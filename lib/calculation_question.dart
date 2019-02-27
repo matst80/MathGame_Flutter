@@ -21,6 +21,9 @@ class CalculationQuestion {
         break;
       case CalculationMode.div:
         modeChar = ' / ';
+        if (second < 0) {
+          second = 1;
+        }
         correctResult = (first / second).toDouble();
         break;
       case CalculationMode.mul:
@@ -38,8 +41,8 @@ class CalculationQuestion {
 
   double getOtherAnswer() {
     var rnd = Random();
-    var maxNum =
-        max((firstNumber * otherNumber) + 1, firstNumber + otherNumber + 1);
+    var maxNum = max(
+        8, max((firstNumber * otherNumber) + 1, firstNumber + otherNumber + 1));
     var newNumber = rnd.nextInt(maxNum);
     while (answers.contains(newNumber.toDouble())) {
       newNumber = rnd.nextInt(maxNum);

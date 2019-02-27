@@ -10,6 +10,11 @@ class UserList extends StatefulWidget {
   _UserList createState() => _UserList();
 }
 
+var userNameStyle = TextStyle(
+  color: Colors.white,
+  fontWeight: FontWeight.bold,
+);
+
 class _UserList extends State<UserList> {
   @override
   Widget build(BuildContext context) {
@@ -19,11 +24,16 @@ class _UserList extends State<UserList> {
               children: [
                 Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text(user.name),
+                  child: Text(
+                    user.name,
+                    style: userNameStyle,
+                  ),
                 ),
                 Padding(
                   padding: EdgeInsets.all(8),
-                  child: Text(user.score.toString()),
+                  child: Chip(
+                    label: Text(user.score.toString()),
+                  ),
                 ),
               ],
             ))

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'user.dart';
 import 'userlist.dart';
 
-
 class WaitScreen extends StatefulWidget {
   WaitScreen({Key key, this.winner, this.users}) : super(key: key);
 
@@ -13,8 +12,17 @@ class WaitScreen extends StatefulWidget {
   _WaitScreen createState() => _WaitScreen();
 }
 
-var winnerTextStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 60);
-var winnerStyle = TextStyle(fontWeight: FontWeight.bold, fontSize: 70);
+var winnerTextStyle = TextStyle(
+  fontWeight: FontWeight.normal,
+  fontSize: 60,
+  color: Colors.white,
+);
+
+var winnerStyle = TextStyle(
+  fontWeight: FontWeight.bold,
+  fontSize: 70,
+  color: Colors.white,
+);
 
 class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
   AnimationController _controller;
@@ -37,7 +45,7 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.blue,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -45,10 +53,15 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
               Hero(
                 tag: 'userlist',
                 child: Material(
-                  color: Colors.blue,
-                  child: UserList(users: widget.users),
+                  elevation: 4,
+                  color: Colors.blue.shade700,
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: UserList(users: widget.users),
+                  ),
                 ),
               ),
+              SizedBox(height: 30),
               Text(
                 'Vinnare:',
                 style: winnerTextStyle,

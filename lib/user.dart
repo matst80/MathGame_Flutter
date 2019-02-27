@@ -24,6 +24,11 @@ class User {
   int get hashCode {
     return ip.hashCode;
   }
+
+  User wrongAnswer() {
+    score--;
+    return this;
+  }
 }
 
 User _$UserFromJson(Map<String, dynamic> json) {

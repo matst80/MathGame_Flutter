@@ -4,6 +4,8 @@ import 'game_screen.dart';
 
 void main() => runApp(MyApp());
 
+var loginStyle = TextStyle(fontWeight: FontWeight.w500, fontSize: 30);
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -49,8 +51,10 @@ class _Onboarding extends State<Onboarding> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 7,
         title: Text('Select nick'),
       ),
+      backgroundColor: Colors.green.shade600,
       body: Container(
         padding: EdgeInsets.all(40),
         child: Column(
@@ -58,10 +62,23 @@ class _Onboarding extends State<Onboarding> {
           children: [
             TextField(
               controller: nameController,
+              style: loginStyle,
+              autocorrect: true,
+              keyboardType: TextInputType.text,
               decoration: InputDecoration(hintText: 'Your nickname'),
             ),
-            RaisedButton(
-              child: Text('Start'),
+            SizedBox(height: 30),
+            OutlineButton(
+              textColor: Colors.white,
+              child: Padding(
+                padding: EdgeInsets.all(8),
+                child: Text(
+                  'STARTA',
+                  style: loginStyle,
+                ),
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(30.0)),
               onPressed: () {
                 var nick = nameController.value.text;
                 _prefs.setString("nick", nick);
