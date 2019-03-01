@@ -248,7 +248,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 470,
+            bottom: 400,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
