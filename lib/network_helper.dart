@@ -5,9 +5,9 @@ import 'dart:convert';
 import 'user.dart';
 import 'round.dart';
 
-typedef void gotQuestionOverUDP(CalculationQuestion question);
-typedef void gotRoundOverUDP(Round round);
-typedef void gotUserOverUDP(User user);
+typedef void GotQuestionOverUDP(CalculationQuestion question);
+typedef void GotRoundOverUDP(Round round);
+typedef void GotUserOverUDP(User user);
 
 Future<String> getIp() async {
   return await Wifi.ip;
@@ -27,8 +27,8 @@ void disconnectSocket() {
   _socket = null;
 }
 
-Future<void> setupUdpListener(gotQuestionOverUDP onQuestion,
-    gotRoundOverUDP onRound, gotUserOverUDP onUser) async {
+Future<void> setupUdpListener(GotQuestionOverUDP onQuestion,
+    GotRoundOverUDP onRound, GotUserOverUDP onUser) async {
   if (_socket == null) {
     var bcast = await getBroadcastAddress();
     _address = InternetAddress(bcast);

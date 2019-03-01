@@ -6,10 +6,12 @@ import 'countdown.dart';
 import 'round.dart';
 import 'user.dart';
 import 'userlist.dart';
+import 'package:flutter_svg/svg.dart';
 
 typedef void AnswerPressed(double answer);
 
-Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
+Widget buildAnswers(
+    List<double> answers, AnswerPressed onAnswer, BuildContext context) {
   var answerWidgets = shuffle(answers
       .map(
         (answer) => RaisedButton(
@@ -27,7 +29,11 @@ Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
                 child: Center(
                   child: Text(
                     answer.toInt().toString(),
-                    style: numberStyle,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
                 ),
               ),
@@ -35,12 +41,7 @@ Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
       )
       .toList());
   return Padding(
-    padding: const EdgeInsets.fromLTRB(
-      22,
-      50,
-      22,
-      50,
-    ),
+    padding: const EdgeInsets.fromLTRB(22, 40, 22, 40),
     child: Wrap(
       spacing: 45,
       alignment: WrapAlignment.center,
@@ -49,25 +50,6 @@ Widget buildAnswers(List<double> answers, AnswerPressed onAnswer) {
     ),
   );
 }
-
-var numberStyle = TextStyle(
-  fontWeight: FontWeight.bold,
-  fontSize: 40,
-  color: Colors.green.shade400,
-);
-
-var bigNumberStyle = TextStyle(
-  fontWeight: FontWeight.bold,
-  fontSize: 70,
-  color: Colors.green.shade400,
-  // shadows: <Shadow>[
-  //   Shadow(
-  //     offset: Offset(3.0, 3.0),
-  //     blurRadius: 9.0,
-  //     color: Color.fromARGB(100, 0, 0, 0),
-  //   )
-  // ],
-);
 
 class GameScreen extends StatefulWidget {
   GameScreen({Key key, this.title, this.name}) : super(key: key);
@@ -83,21 +65,27 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   List<User> _users = List<User>();
   String _lastWinner = '';
   User _me;
-
-  CalculationQuestion _question =
-      CalculationQuestion(CalculationMode.add, 3, 4);
+  double _monsterBottom = 310;
+  CalculationQuestion _question = CalculationQuestion.generate(20);
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  TextStyle bigNumberStyle = TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 70,
+    color: Colors.green.shade400,
+  );
+
   void showCountDown() {
     Navigator.push(
-        _scaffoldKey.currentState.context,
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) {
-            return WaitScreen(winner: _lastWinner, users: _users);
-          },
-          fullscreenDialog: true,
-        ));
+      _scaffoldKey.currentState.context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) {
+          return WaitScreen(winner: _lastWinner, users: _users);
+        },
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   void showQuestionDirect(CalculationQuestion question) {
@@ -106,21 +94,20 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     });
   }
 
-  void showNewQuestion(CalculationQuestion question) {
-    setState(() {
-      _question = question;
-    });
+  void showQuestionAfterDelay(CalculationQuestion question) {
+    showQuestionDirect(question);
     Navigator.pop(_scaffoldKey.currentState.context);
+    setState(() {
+      _monsterBottom = 310;
+    });
   }
 
   void gotQuestion(CalculationQuestion question) {
     showCountDown();
 
     Future.delayed(
-      Duration(
-        milliseconds: 3500,
-      ),
-    ).then((o) => showNewQuestion(question));
+      Duration(milliseconds: 3500),
+    ).then((o) => showQuestionAfterDelay(question));
   }
 
   void gotRound(Round round) {
@@ -163,7 +150,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
 
   void _gotAnswer(double answer) {
     var isCorrect = (answer == _question.correctResult);
-
+    setState(() {
+      _monsterBottom = isCorrect ? 310 : 220;
+    });
     if (isCorrect) {
       sendRound(Round(
         _me.addWin(),
@@ -174,6 +163,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       sendUser(_me.wrongAnswer());
     }
   }
+
+  final Widget gubbe = new SvgPicture.asset(
+    'assets/monster-short.svg',
+    width: 156,
+    height: 150,
+  );
 
   @override
   void initState() {
@@ -191,60 +186,84 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        
-        iconTheme: IconThemeData(
-          color: Colors.black
-        ),
-        elevation: 0,
-        //title: Text(widget.title + ' - ' + widget.name),
-      ),
-      // floatingActionButton: IconButton(
-      //   icon: Icon(Icons.close),
-      //   onPressed: () => Navigator.pop(context),
+      // appBar: AppBar(
+      //   backgroundColor: Colors.white,
+      //   iconTheme: IconThemeData(color: Colors.black),
+      //   elevation: 0,
       // ),
-      //floatingActionButtonLocation: FloatingActionButtonLocation.,
       backgroundColor: Colors.white,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
         children: [
-          Hero(
-            tag: 'userlist',
-            child: Material(
-              elevation: 0,
-              color: Colors.transparent,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal:16, vertical: 4),
-                child: UserList(users: _users),
+          Positioned(
+            top: 18,
+            left: 10,
+            child: IconButton(
+              onPressed: () => Navigator.pop(context),
+              iconSize: 30,
+              icon: Icon(Icons.arrow_back),
+            ),
+          ),
+          Positioned(
+            top: 45,
+            left: 0,
+            right: 0,
+            child: Hero(
+              tag: 'userlist',
+              child: Material(
+                elevation: 0,
+                color: Colors.transparent,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  child: UserList(users: _users),
+                ),
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(_question.firstNumber.toString(), style: bigNumberStyle),
-              Text(_question.modeChar, style: bigNumberStyle),
-              Text(_question.otherNumber.toString(), style: bigNumberStyle),
-            ],
+          AnimatedPositioned(
+            duration: Duration(milliseconds: 300),
+            bottom: _monsterBottom,
+            left: 60,
+            right: 60,
+            height: 200,
+            child: gubbe,
           ),
-          // Material(
-          //   color: Colors.white,
-          //   borderRadius: BorderRadius.circular(20),
-          //   child: SizedBox(
-          //     height: 30,
-          //   ),
-          // ),
-          Material(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 310,
+            child: Material(
+              color: Theme.of(context).accentColor,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(30),
+                topRight: Radius.circular(30),
+              ),
+              child: buildAnswers(_question.answers, _gotAnswer, context),
             ),
-            color: Colors.green.shade400,
-            elevation: 4,
-            child: Center(
-              child: buildAnswers(_question.answers, _gotAnswer),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 470,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(_question.firstNumber.toString(),
+                        style: bigNumberStyle),
+                    Text(_question.modeChar, style: bigNumberStyle),
+                    Text(_question.otherNumber.toString(),
+                        style: bigNumberStyle),
+                  ],
+                ),
+              ],
             ),
           ),
         ],

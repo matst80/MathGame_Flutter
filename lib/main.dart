@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'game_screen.dart';
+import 'package:flutter_svg/svg.dart';
 
 void main() => runApp(MyApp());
-
-var loginStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 16);
-var loginTitleStyle = TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: Colors.white);
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -15,6 +12,8 @@ class MyApp extends StatelessWidget {
       title: 'Math game',
       theme: ThemeData(
         primarySwatch: Colors.green,
+        accentColor: Color.fromARGB(255, 45, 204, 113),
+        brightness: Brightness.light,
       ),
       home: Onboarding(), //MyHomePage(title: 'Calculus game'),
     );
@@ -30,6 +29,32 @@ class _Onboarding extends State<Onboarding> {
   final nameController = TextEditingController();
 
   SharedPreferences _prefs;
+
+  final TextStyle loginStyle = TextStyle(
+    fontWeight: FontWeight.normal,
+    fontSize: 16,
+  );
+
+  final TextStyle loginStyleInput = TextStyle(
+    color: Colors.white
+  );
+  
+  final TextStyle loginTitleStyle = TextStyle(
+    fontWeight: FontWeight.normal,
+    fontSize: 16,
+    color: Colors.white,
+  );
+
+  final Widget svg = new SvgPicture.asset(
+    'assets/star-white.svg',
+    width: 100,
+    height: 100,
+  );
+
+  final Widget gubbe = new SvgPicture.asset(
+    'assets/monster-short.svg',
+    width: 200,
+  );
 
   @override
   void dispose() {
@@ -56,59 +81,83 @@ class _Onboarding extends State<Onboarding> {
       //   elevation: 7,
       //   title: Text('Select nick'),
       // ),
-      backgroundColor: Colors.green.shade400,
-      body: Container(
-        padding: EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Enter your name to start the game',
-              style: loginTitleStyle,
+      backgroundColor: Theme.of(context).accentColor,
+      body: Stack(
+        children: [
+          Positioned(
+            bottom: 0,
+            height: 180,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: gubbe,
             ),
-            SizedBox(height: 17),
-            TextField(
-              controller: nameController,
-              style: loginStyle,
-              autocorrect: true,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                hintText: 'Your nickname',
-                hintStyle: loginStyle,
-              ),
-            ),
-            SizedBox(height: 30),
-            RaisedButton(
-              color: Colors.white,
-              textColor: Colors.green.shade400,
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 35,
-                  vertical: 14,
-                ),
-                child: Text(
-                  'START GAME',
-                  style: loginStyle,
-                ),
-              ),
-              shape: RoundedRectangleBorder(
-                  borderRadius: new BorderRadius.circular(30.0)),
-              onPressed: () {
-                var nick = nameController.value.text;
-                _prefs.setString("nick", nick);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => GameScreen(
-                          title: 'Player',
-                          name: nick,
-                        ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 180,
+            child: Container(
+              padding: EdgeInsets.all(40),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: svg,
+                    padding: EdgeInsets.all(50),
                   ),
-                );
-              },
+                  Text(
+                    'Enter your name to start the game',
+                    style: loginTitleStyle,
+                  ),
+                  SizedBox(height: 17),
+                  TextField(
+                    controller: nameController,
+                    textAlign: TextAlign.center,
+                    style: loginStyleInput,
+                    autocorrect: true,
+                    keyboardType: TextInputType.text,
+                    decoration: InputDecoration(
+                      hintText: 'Your nickname',
+                      hintStyle: loginStyle,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  RaisedButton(
+                    color: Colors.white,
+                    textColor: Theme.of(context).accentColor,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 35,
+                        vertical: 14,
+                      ),
+                      child: Text(
+                        'START GAME',
+                        style: loginStyle,
+                      ),
+                    ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(30.0)),
+                    onPressed: () {
+                      var nick = nameController.value.text;
+                      _prefs.setString("nick", nick);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => GameScreen(
+                                title: 'Player',
+                                name: nick,
+                              ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
