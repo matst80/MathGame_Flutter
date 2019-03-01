@@ -225,9 +225,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
           AnimatedPositioned(
             duration: Duration(milliseconds: 300),
             bottom: _monsterBottom,
-            left: 60,
-            right: 60,
-            height: 200,
+            left: 90,
+            right: 90,
+            height: 150,
             child: gubbe,
           ),
           Positioned(
