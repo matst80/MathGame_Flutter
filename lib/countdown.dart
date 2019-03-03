@@ -69,16 +69,9 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
                 child: Column(
                   //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Hero(
-                      tag: 'userlist',
-                      child: Material(
-                        elevation: 0,
-                        color: Colors.transparent,
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: UserList(users: widget.users),
-                        ),
-                      ),
+                    Padding(
+                      padding: EdgeInsets.all(16),
+                      child: UserListOverview(users: widget.users),
                     ),
                     SizedBox(height: 10),
                     trophy,
