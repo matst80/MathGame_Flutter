@@ -103,6 +103,7 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
                               color: Colors.black,
                             ),
                           ),
+                          SizedBox(height: 30),
                           AnimatedBuilder(
                             animation: _controller,
                             builder: (BuildContext context, Widget child) {
