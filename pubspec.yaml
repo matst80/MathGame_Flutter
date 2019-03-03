@@ -21,6 +21,8 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  percent_indicator: any
+  animated_background: any
   flutter_svg: any
   json_annotation: any
   shared_preferences: any

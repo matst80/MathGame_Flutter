@@ -7,6 +7,7 @@ import 'round.dart';
 import 'user.dart';
 import 'userlist.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:animated_background/animated_background.dart';
 
 typedef void AnswerPressed(double answer);
 
@@ -65,15 +66,18 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   List<User> _users = List<User>();
   String _lastWinner = '';
   User _me;
-  double _monsterBottom = 310;
+  double _monsterBottom = -10;
   CalculationQuestion _question = CalculationQuestion.generate(20);
+
+  AnimationController _controller;
+  Animation<double> _animation;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TextStyle bigNumberStyle = TextStyle(
     fontWeight: FontWeight.bold,
     fontSize: 70,
-    color: Colors.green.shade400,
+    color: Colors.black87,
   );
 
   void showCountDown() {
@@ -98,8 +102,9 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
     showQuestionDirect(question);
     Navigator.pop(_scaffoldKey.currentState.context);
     setState(() {
-      _monsterBottom = 310;
+      _monsterBottom = -10;
     });
+    _controller.forward(from: 0);
   }
 
   void gotQuestion(CalculationQuestion question) {
@@ -151,7 +156,7 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void _gotAnswer(double answer) {
     var isCorrect = (answer == _question.correctResult);
     setState(() {
-      _monsterBottom = isCorrect ? 310 : 220;
+      _monsterBottom = isCorrect ? 0 : -70;
     });
     if (isCorrect) {
       sendRound(Round(
@@ -174,6 +179,15 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     setupSocket();
+    _controller = AnimationController(
+      duration: Duration(seconds: 10),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: new Interval(0, 1, curve: Curves.linear),
+    );
+    _controller.forward();
   }
 
   @override
@@ -195,52 +209,12 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
       body: Stack(
         children: [
           Positioned(
-            top: 18,
-            left: 10,
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              iconSize: 30,
-              icon: Icon(Icons.arrow_back),
-            ),
-          ),
-          Positioned(
-            top: 45,
-            left: 0,
-            right: 0,
-            child: Hero(
-              tag: 'userlist',
-              child: Material(
-                elevation: 0,
-                color: Colors.transparent,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 4,
-                  ),
-                  child: UserList(users: _users),
-                ),
-              ),
-            ),
-          ),
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 300),
-            bottom: _monsterBottom,
-            left: 90,
-            right: 90,
-            height: 150,
-            child: gubbe,
-          ),
-          Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            height: 310,
+            height: 320,
             child: Material(
               color: Theme.of(context).accentColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
-              ),
               child: buildAnswers(_question.answers, _gotAnswer, context),
             ),
           ),
@@ -248,24 +222,99 @@ class _GameScreenState extends State<GameScreen> with TickerProviderStateMixin {
             top: 0,
             left: 0,
             right: 0,
-            bottom: 400,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(_question.firstNumber.toString(),
-                        style: bigNumberStyle),
-                    Text(_question.modeChar, style: bigNumberStyle),
-                    Text(_question.otherNumber.toString(),
-                        style: bigNumberStyle),
+            bottom: 300,
+            child: Material(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              color: Colors.white,
+              child: AnimatedBackground(
+                behaviour: RandomParticleBehaviour(
+                  options: ParticleOptions(
+                    baseColor: Colors.green.shade400,
+                    particleCount: 10,
+                    spawnMaxRadius: 40,
+                    spawnMaxSpeed: 100,
+                    spawnMinSpeed: 10,
+                    minOpacity: 0.03,
+                    maxOpacity: 0.2,
+                  ),
+                ),
+                vsync: this,
+                child: Stack(
+                  children: <Widget>[
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 300),
+                      bottom: _monsterBottom,
+                      left: 90,
+                      right: 90,
+                      height: 150,
+                      child: gubbe,
+                    ),
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(_question.firstNumber.toString(),
+                                  style: bigNumberStyle),
+                              Text(_question.modeChar, style: bigNumberStyle),
+                              Text(_question.otherNumber.toString(),
+                                  style: bigNumberStyle),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    Positioned(
+                      top: 18,
+                      left: 10,
+                      child: IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        iconSize: 30,
+                        icon: Icon(Icons.arrow_back),
+                      ),
+                    ),
+                    Positioned(
+                      top: 45,
+                      left: 0,
+                      right: 0,
+                      child: Hero(
+                        tag: 'userlist',
+                        child: Material(
+                          elevation: 0,
+                          color: Colors.transparent,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            child: UserList(users: _users),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
+          // AnimatedPositioned(
+          //   duration: Duration(milliseconds: 300),
+          //   bottom: _monsterBottom,
+          //   left: 90,
+          //   right: 90,
+          //   height: 150,
+          //   child: gubbe,
+          // ),
         ],
       ),
     );

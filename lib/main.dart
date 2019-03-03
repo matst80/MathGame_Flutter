@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'game_screen.dart';
 import 'package:flutter_svg/svg.dart';
@@ -8,6 +9,9 @@ void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.white.withAlpha(50), 
+    ));
     return MaterialApp(
       title: 'Math game',
       theme: ThemeData(
@@ -15,7 +19,7 @@ class MyApp extends StatelessWidget {
         accentColor: Color.fromARGB(255, 45, 204, 113),
         brightness: Brightness.light,
       ),
-      home: Onboarding(), //MyHomePage(title: 'Calculus game'),
+      home: Onboarding(), 
     );
   }
 }

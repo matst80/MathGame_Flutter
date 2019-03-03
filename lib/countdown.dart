@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'user.dart';
 import 'userlist.dart';
-import 'dart:math';
 import 'package:flutter_svg/svg.dart';
+import 'package:percent_indicator/percent_indicator.dart';
+import 'package:animated_background/animated_background.dart';
 
 class WaitScreen extends StatefulWidget {
   WaitScreen({Key key, this.winner, this.users}) : super(key: key);
@@ -31,8 +32,8 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
 
   final Widget trophy = new SvgPicture.asset(
     'assets/trophy.svg',
-    width: 220,
-    height: 280,
+    width: 90,
+    height: 145,
   );
 
   @override
@@ -44,107 +45,92 @@ class _WaitScreen extends State<WaitScreen> with TickerProviderStateMixin {
         backgroundColor: Colors.white.withAlpha(190),
         body: Container(
           child: Padding(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 40,
+            ),
             child: Material(
               borderRadius: BorderRadius.all(Radius.circular(20)),
               color: Colors.white,
-              child: Column(
-                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Hero(
-                    tag: 'userlist',
-                    child: Material(
-                      elevation: 0,
-                      color: Colors.transparent,
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: UserList(users: widget.users),
+              child: AnimatedBackground(
+                //behaviour: SpaceBehaviour(),
+                behaviour: RandomParticleBehaviour(
+                  options: ParticleOptions(
+                    baseColor: Colors.green.shade400,
+                    particleCount: 17,
+                    spawnMaxRadius: 30,
+                    spawnMaxSpeed: 100,
+                    spawnMinSpeed: 10,
+                    minOpacity: 0.03,
+                    maxOpacity: 0.2,
+                  ),
+                ),
+                vsync: this,
+                child: Column(
+                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Hero(
+                      tag: 'userlist',
+                      child: Material(
+                        elevation: 0,
+                        color: Colors.transparent,
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: UserList(users: widget.users),
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  trophy,
-                  SizedBox(height: 10),
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'WINNER',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 30,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Text(
-                          _lastWinner,
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontSize: 50,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Stack(children: <Widget>[
-                          Positioned.fill(
-                            child: AnimatedBuilder(
-                              animation: _controller,
-                              builder: (BuildContext context, Widget child) {
-                                return CustomPaint(
-                                  painter: TimerPainter(
-                                    animation: _controller,
-                                    color: Colors.white,
-                                  ),
-                                );
-                              },
+                    SizedBox(height: 10),
+                    trophy,
+                    SizedBox(height: 10),
+                    Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'WINNER',
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 30,
+                              color: Colors.grey,
                             ),
                           ),
-                          Align(
-                            alignment: FractionalOffset.center,
-                            child: Countdown(
-                              animation: new StepTween(
-                                begin: kStartValue,
-                                end: 0,
-                              ).animate(_controller),
+                          Text(
+                            _lastWinner,
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 50,
+                              color: Colors.black,
                             ),
                           ),
-                        ]),
-                      ],
+                          AnimatedBuilder(
+                            animation: _controller,
+                            builder: (BuildContext context, Widget child) {
+                              return new CircularPercentIndicator(
+                                radius: 90.0,
+                                lineWidth: 8.0,
+                                percent: _controller.value,
+                                center: Countdown(
+                                  animation: new StepTween(
+                                    begin: kStartValue,
+                                    end: 0,
+                                  ).animate(_controller),
+                                ),
+                                progressColor: Colors.green,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-  }
-}
-
-class TimerPainter extends CustomPainter {
-  final Animation<double> animation;
-  final Color color;
-
-  TimerPainter({this.animation, this.color}) : super(repaint: animation);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = 5.0
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-
-    //canvas.drawCircle(size.center(Offset.zero), size.width / 2.0, paint);
-
-    double progress = (1.0 - animation.value) * 2 * pi;
-    canvas.drawArc(Offset.zero & size, pi, -progress, false, paint);
-  }
-
-  @override
-  bool shouldRepaint(TimerPainter old) {
-    return animation.value != old.animation.value;
   }
 }
 
@@ -157,8 +143,8 @@ class Countdown extends AnimatedWidget {
     return new Text(
       animation.value.toString(),
       style: new TextStyle(
-        fontSize: 150.0,
-        color: Colors.blue.shade200,
+        fontSize: 45.0,
+        color: Colors.black,
       ),
     );
   }
